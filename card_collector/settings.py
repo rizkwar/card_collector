@@ -10,22 +10,33 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / ".env")
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-hfxwuabaf9d0l8#)rc&_taohmdbkwd+ko809f!72&^y6hw&bsk'
+SECRET_KEY = os.environ.get("SECRET_KEY", "")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get(
+        "ALLOWED_HOSTS",
+        "127.0.0.1,localhost",
+    ).split(",")
+    if host.strip()
+]
 
 
 # Application definition
@@ -37,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "cards",
 ]
 
 MIDDLEWARE = [
@@ -54,7 +66,7 @@ ROOT_URLCONF = 'card_collector.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        "DIRS": [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -114,8 +126,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
