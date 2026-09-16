@@ -91,3 +91,53 @@ def prototype_open_pack(request):
             "drawn_cards": drawn_cards,
         },
     )
+
+def prototype_collection(request):
+    collection = request.session.get(
+        "collection",
+        {},
+    )
+
+    total_unique_possible = len(PROTOTYPE_CARDS)
+    unique_owned = len(collection)
+
+    percent = (
+        round(
+            (unique_owned / total_unique_possible) * 100,
+            1,
+        )
+        if total_unique_possible
+        else 0
+    )
+
+    by_franchise = {}
+
+    for card in PROTOTYPE_CARDS:
+        card_name = card["name"]
+
+        if card_name not in collection:
+            continue
+
+        franchise = card["franchise"]
+
+        by_franchise.setdefault(
+            franchise,
+            [],
+        ).append(
+            {
+                "name": card_name,
+                "amount": collection[card_name],
+                "rarity": card["rarity"],
+            }
+        )
+
+    return render(
+        request,
+        "prototype/collection.html",
+        {
+            "by_franchise": by_franchise,
+            "unique_owned": unique_owned,
+            "total_unique_possible": total_unique_possible,
+            "percent": percent,
+        },
+    )

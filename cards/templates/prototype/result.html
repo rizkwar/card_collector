@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Pack Result</title>
+</head>
+
+<body>
+    <h1>You Pulled:</h1>
+
+    <ul>
+        {% for card in drawn_cards %}
+            <li>
+                <strong>{{ card.name }}</strong>
+                — {{ card.franchise }}
+                — {{ card.rarity }}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <p>
+        <a href="{% url 'home' %}">
+            Open another pack
+        </a>
+    </p>
+
+    <p>
+        <a href="{% url 'collection' %}">
+            View collection
+        </a>
+    </p>
+</body>
+</html>
