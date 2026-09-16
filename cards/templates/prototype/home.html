@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,30 +10,54 @@
     >
 
     <title>Card Collector</title>
+    <link
+        rel="stylesheet"
+        href="{% static 'css/prototype.css' %}"
+    >
 </head>
 
 <body>
-    <h1>Card Collector</h1>
+    <div class="page-glow glow-one" aria-hidden="true"></div>
+    <div class="page-glow glow-two" aria-hidden="true"></div>
 
-    <p>
-        Open a pack and receive five random cards.
-    </p>
-
-    <form
-        action="{% url 'open_pack' %}"
-        method="post"
-    >
-        {% csrf_token %}
-
-        <button type="submit">
-            Open Pack
-        </button>
-    </form>
-
-    <p>
-        <a href="{% url 'collection' %}">
-            View Collection
+    <header class="site-header">
+        <a class="wordmark" href="{% url 'home' %}">
+            <span class="wordmark-mark">CC</span>
+            Card Collector
         </a>
-    </p>
+
+        <p class="pack-meta">5 cards per pack</p>
+    </header>
+
+    <main class="opening-screen">
+        <p class="eyebrow">Series 001 <span aria-hidden="true">•</span> Naruto</p>
+        <h1>One pack.<br>Five new stories.</h1>
+        <p class="intro">
+            Every pack contains five random cards. Will your next pull be legendary?
+        </p>
+
+        <form action="{% url 'open_pack' %}" method="post">
+            {% csrf_token %}
+
+            <button class="pack-button" type="submit" aria-label="Open a Naruto card pack">
+                <span class="pack-shadow" aria-hidden="true"></span>
+                <span class="card-pack" aria-hidden="true">
+                    <span class="pack-top"></span>
+                    <span class="pack-corner pack-corner-left"></span>
+                    <span class="pack-corner pack-corner-right"></span>
+                    <span class="pack-content">
+                        <span class="pack-series">Collector's edition</span>
+                        <span class="pack-title">NINJA<br>CHRONICLES</span>
+                        <span class="pack-symbol">火</span>
+                        <span class="pack-count">5 cards inside</span>
+                    </span>
+                    <span class="pack-bottom"></span>
+                </span>
+                <span class="open-label">Open pack <span aria-hidden="true">→</span></span>
+            </button>
+        </form>
+
+        <p class="pull-note">Tap the pack to reveal your pull</p>
+    </main>
 </body>
 </html>
