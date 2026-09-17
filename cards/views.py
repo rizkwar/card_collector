@@ -6,34 +6,34 @@ from django.views.decorators.http import require_POST
 
 PROTOTYPE_CARDS = [
     {
-        "name": "Naruto Uzumaki",
-        "franchise": "Naruto",
-        "rarity": "COMMON",
+        "name": "Fang Yuan",
+        "franchise": "Reverend Insanity",
+        "rarity": "LEGENDARY",
     },
     {
-        "name": "Sakura Haruno",
-        "franchise": "Naruto",
-        "rarity": "COMMON",
-    },
-    {
-        "name": "Sasuke Uchiha",
-        "franchise": "Naruto",
-        "rarity": "UNCOMMON",
-    },
-    {
-        "name": "Kakashi Hatake",
-        "franchise": "Naruto",
-        "rarity": "UNCOMMON",
-    },
-    {
-        "name": "Madara Uchiha",
-        "franchise": "Naruto",
+        "name": "Bai Ning Bing",
+        "franchise": "Reverend Insanity",
         "rarity": "RARE",
     },
     {
-        "name": "Hashirama Senju",
-        "franchise": "Naruto",
-        "rarity": "LEGENDARY",
+        "name": "Hei Luo Lan",
+        "franchise": "Reverend Insanity",
+        "rarity": "RARE",
+    },
+    {
+        "name": "Ying Wu Xie",
+        "franchise": "Reverend Insanity",
+        "rarity": "UNCOMMON",
+    },
+    {
+        "name": "Fairy Miao Yin",
+        "franchise": "Reverend Insanity",
+        "rarity": "UNCOMMON",
+    },
+    {
+        "name": "Laddy White Rabbit",
+        "franchise": "Reverend Insanity",
+        "rarity": "COMMON",
     },
 ]
 
