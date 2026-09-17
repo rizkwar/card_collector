@@ -13,6 +13,18 @@
     box-sizing: border-box;
 }
 
+a,
+a:link,
+a:visited,
+a:hover,
+a:active,
+a:focus,
+a:focus-visible {
+    color: #f4fbff !important;
+    text-decoration: none !important;
+    text-underline-offset: 0 !important;
+}
+
 body {
     min-height: 100vh;
     margin: 0;
@@ -490,6 +502,35 @@ h1 {
 .button-primary { border-color: var(--cyan); color: var(--ink); background: var(--cyan); }
 .button-primary:hover { background: var(--cyan-strong); }
 .button-secondary:hover { border-color: var(--cyan); color: var(--cyan-strong); }
+
+.collection-card h3 a,
+.collection-card h3 a:link,
+.collection-card h3 a:visited,
+.collection-card h3 a:hover,
+.collection-card h3 a:active,
+.collection-card h3 a:focus,
+.collection-card h3 a:focus-visible {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
+    padding: 0.2rem 0.45rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(7, 16, 20, 0.84);
+    color: #f4fbff !important;
+    text-decoration: none !important;
+    font-size: 0.72rem;
+    line-height: 1.2;
+    transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.collection-card h3 a:hover,
+.collection-card h3 a:focus,
+.collection-card h3 a:focus-visible {
+    border-color: rgba(87, 221, 252, 0.52);
+    background: rgba(14, 25, 29, 0.98);
+    color: var(--cyan-strong) !important;
+    transform: translateY(-1px);
+}
 
 .collection-summary {
     display: grid;
