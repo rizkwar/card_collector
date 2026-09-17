@@ -1,38 +1,46 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Pack Result</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pack Opened | Card Collector</title>
+    <link rel="stylesheet" href="{% static 'css/prototype.css' %}">
 </head>
-
 <body>
-    <h1>You Pulled:</h1>
-
-    <ul>
-        {% for card in drawn_cards %}
-            <li>
-                <strong>{{ card.name }}</strong>
-                — {{ card.franchise }}
-                — {{ card.rarity }}
-            </li>
-        {% endfor %}
-    </ul>
-
-    <p>
-        <a href="{% url 'home' %}">
-            Open another pack
-        </a>
-    </p>
-
-    <p>
-        <a href="{% url 'collection' %}">
-            View collection
-        </a>
-    </p>
+    <div class="page-glow glow-one" aria-hidden="true"></div>
+    <div class="page-glow glow-two" aria-hidden="true"></div>
+    <header class="site-header">
+        <a class="wordmark" href="{% url 'home' %}"><span class="wordmark-mark">CC</span> Card Collector</a>
+        <p class="pack-meta">Pack opened</p>
+    </header>
+    <main class="game-page">
+        <p class="eyebrow">Pack reveal <span aria-hidden="true">•</span> Series 001</p>
+        <h1 class="page-title">Your new<br>collection.</h1>
+        <p class="page-intro">Five cards have been added to your collection.</p>
+        <section class="pull-grid" aria-label="Cards pulled from this pack">
+            {% for card in drawn_cards %}
+                <article class="pull-card rarity-{{ card.rarity|lower }}">
+                    <p class="card-position">0{{ forloop.counter }}</p>
+                    <div class="pull-card-art" aria-hidden="true"><span>{{ card.rarity|slice:":1" }}</span></div>
+                    <div class="pull-card-info">
+                        <p class="rarity-label">{{ card.rarity }}</p>
+                        <h2>{{ card.name }}</h2>
+                        <p class="franchise-name">{{ card.franchise }}</p>
+                    </div>
+                    {% if card.is_duplicate %}
+                        <p class="card-status">Copy #{{ card.collection_amount }}</p>
+                    {% else %}
+                        <p class="card-status card-status-new">New card</p>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </section>
+        <nav class="page-actions" aria-label="Pack actions">
+            <a class="button button-secondary" href="{% url 'collection' %}">View collection</a>
+            <a class="button button-primary" href="{% url 'home' %}">Open another pack <span aria-hidden="true">→</span></a>
+        </nav>
+    </main>
 </body>
 </html>

@@ -1,6 +1,7 @@
 import random
 
 from django.shortcuts import render
+from django.views.decorators.http import require_POST
 
 
 PROTOTYPE_CARDS = [
@@ -78,17 +79,36 @@ def prototype_home(request):
     )
 
 
+@require_POST
 def prototype_open_pack(request):
     drawn_cards = [
         draw_card()
         for _ in range(5)
     ]
 
+    collection = request.session.get("collection", {})
+    pulled_cards = []
+
+    for card in drawn_cards:
+        card_name = card["name"]
+        previous_amount = collection.get(card_name, 0)
+        collection[card_name] = previous_amount + 1
+
+        pulled_cards.append(
+            {
+                **card,
+                "is_duplicate": previous_amount > 0,
+                "collection_amount": collection[card_name],
+            }
+        )
+
+    request.session["collection"] = collection
+
     return render(
         request,
         "prototype/result.html",
         {
-            "drawn_cards": drawn_cards,
+            "drawn_cards": pulled_cards,
         },
     )
 
@@ -98,8 +118,15 @@ def prototype_collection(request):
         {},
     )
 
+    owned_cards = [
+        card
+        for card in PROTOTYPE_CARDS
+        if card["name"] in collection
+    ]
+
     total_unique_possible = len(PROTOTYPE_CARDS)
-    unique_owned = len(collection)
+    unique_owned = len(owned_cards)
+    total_copies = sum(collection[card["name"]] for card in owned_cards)
 
     percent = (
         round(
@@ -138,6 +165,7 @@ def prototype_collection(request):
             "by_franchise": by_franchise,
             "unique_owned": unique_owned,
             "total_unique_possible": total_unique_possible,
+            "total_copies": total_copies,
             "percent": percent,
         },
     )

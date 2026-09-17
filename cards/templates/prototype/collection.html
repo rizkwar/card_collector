@@ -1,0 +1,58 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Collection | Card Collector</title>
+    <link rel="stylesheet" href="{% static 'css/prototype.css' %}">
+</head>
+<body>
+    <div class="page-glow glow-one" aria-hidden="true"></div>
+    <div class="page-glow glow-two" aria-hidden="true"></div>
+    <header class="site-header">
+        <a class="wordmark" href="{% url 'home' %}"><span class="wordmark-mark">CC</span> Card Collector</a>
+        <p class="pack-meta">My collection</p>
+    </header>
+    <main class="game-page collection-page">
+        <p class="eyebrow">Series 001 <span aria-hidden="true">•</span> Naruto</p>
+        <h1 class="page-title">Your card<br>archive.</h1>
+        <section class="collection-summary" aria-label="Collection progress">
+            <div>
+                <p class="summary-label">Collection completion</p>
+                <p class="summary-value">{{ percent }}<span>%</span></p>
+                <p class="summary-detail">{{ unique_owned }} of {{ total_unique_possible }} unique cards found</p>
+            </div>
+            <div class="progress-track" role="progressbar" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100"><span class="progress-fill" style="--completion: {{ percent }}%;"></span></div>
+            <p class="copy-total">{{ total_copies }} card{{ total_copies|pluralize }} collected</p>
+        </section>
+        {% if by_franchise %}
+            {% for franchise, cards in by_franchise.items %}
+                <section class="franchise-section">
+                    <div class="section-heading">
+                        <p class="section-kicker">Franchise</p><h2>{{ franchise }}</h2><span>{{ cards|length }} discovered</span>
+                    </div>
+                    <div class="collection-grid">
+                        {% for card in cards %}
+                            <article class="collection-card rarity-{{ card.rarity|lower }}">
+                                <div class="collection-card-mark" aria-hidden="true">{{ card.rarity|slice:":1" }}</div>
+                                <div><p class="rarity-label">{{ card.rarity }}</p><h3>{{ card.name }}</h3></div>
+                                <p class="quantity">×{{ card.amount }}</p>
+                            </article>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endfor %}
+            <a class="button button-primary collection-open-button" href="{% url 'home' %}">Open another pack <span aria-hidden="true">→</span></a>
+        {% else %}
+            <section class="empty-state">
+                <p class="eyebrow">Nothing here yet</p>
+                <h2>Your first five cards are waiting.</h2>
+                <p>Open a pack to start building your archive.</p>
+                <a class="button button-primary" href="{% url 'home' %}">Open your first pack <span aria-hidden="true">→</span></a>
+            </section>
+        {% endif %}
+    </main>
+</body>
+</html>
