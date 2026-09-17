@@ -17,6 +17,10 @@ class Command(BaseCommand):
     help = "Create the starter Reverend Insanity cards, pack, and pack weights."
 
     def handle(self, *args, **options):
+        Franchise.objects.filter(name="Naruto").delete()
+        Pack.objects.filter(franchise__name="Naruto").delete()
+        Card.objects.filter(franchise__name="Naruto").delete()
+
         franchise, _ = Franchise.objects.get_or_create(name="Reverend Insanity")
         pack, _ = Pack.objects.update_or_create(
             franchise=franchise,
