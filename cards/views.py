@@ -3,6 +3,8 @@ import random
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
 
+from .models import Pack
+
 
 PROTOTYPE_CARDS = [
     {
@@ -57,19 +59,25 @@ def roll_rarity():
     )[0]
 
 
-def draw_card():
-    rarity = roll_rarity()
+def draw_card(pack):
+    pack_cards = list(
+        pack.pack_cards.select_related("card", "card__franchise")
+    )
 
-    pool = [
-        card
-        for card in PROTOTYPE_CARDS
-        if card["rarity"] == rarity
-    ]
+    if not pack_cards:
+        raise ValueError(f"No cards are configured for pack: {pack.name}")
 
-    if not pool:
-        raise ValueError(f"No cards exist for rarity {rarity}")
+    total_weight = sum(entry.weight for entry in pack_cards)
+    if total_weight <= 0:
+        raise ValueError(f"Pack weights must be positive for {pack.name}")
 
-    return random.choice(pool)
+    selected_entry = random.choices(
+        population=pack_cards,
+        weights=[entry.weight for entry in pack_cards],
+        k=1,
+    )[0]
+
+    return selected_entry.card
 
 
 def prototype_home(request):
@@ -81,22 +89,36 @@ def prototype_home(request):
 
 @require_POST
 def prototype_open_pack(request):
+    pack = Pack.objects.filter(is_active=True).order_by("pk").first()
+    if pack is None:
+        raise ValueError("No active pack is available in the database.")
+
     drawn_cards = [
-        draw_card()
-        for _ in range(5)
+        draw_card(pack)
+        for _ in range(pack.cards_per_pack)
     ]
 
     collection = request.session.get("collection", {})
     pulled_cards = []
 
     for card in drawn_cards:
-        card_name = card["name"]
+        if hasattr(card, "name"):
+            card_name = card.name
+            franchise_name = card.franchise.name
+            rarity = card.rarity
+        else:
+            card_name = card["name"]
+            franchise_name = card["franchise"]
+            rarity = card["rarity"]
+
         previous_amount = collection.get(card_name, 0)
         collection[card_name] = previous_amount + 1
 
         pulled_cards.append(
             {
-                **card,
+                "name": card_name,
+                "franchise": franchise_name,
+                "rarity": rarity,
                 "is_duplicate": previous_amount > 0,
                 "collection_amount": collection[card_name],
             }

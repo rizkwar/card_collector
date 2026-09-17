@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from .models import Card, Franchise, Pack, PackCard
-from .views import PROTOTYPE_CARDS
+from .views import PROTOTYPE_CARDS, draw_card
 
 
 class PrototypePackTests(TestCase):
@@ -16,6 +16,7 @@ class PrototypePackTests(TestCase):
 
     @patch("cards.views.draw_card")
     def test_opening_a_pack_counts_duplicate_cards_in_the_session(self, mock_draw_card):
+        call_command("seed_cards")
         fang_yuan = PROTOTYPE_CARDS[0]
         mock_draw_card.side_effect = [fang_yuan] * 5
 
@@ -57,3 +58,13 @@ class SeedCardsCommandTests(TestCase):
             ).weight,
             5,
         )
+
+    def test_draw_card_uses_database_pack_cards(self):
+        call_command("seed_cards")
+        pack = Pack.objects.get(name="Starter Pack")
+
+        cards = [draw_card(pack) for _ in range(pack.cards_per_pack)]
+
+        self.assertEqual(len(cards), 5)
+        self.assertTrue(all(isinstance(card, Card) for card in cards))
+        self.assertTrue(all(card.franchise.name == "Reverend Insanity" for card in cards))
