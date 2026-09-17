@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Packs | Card Collector{% endblock %}
+{% block header_meta %}Packs{% endblock %}
+
+{% block content %}
+    <p class="eyebrow">Pack archive <span aria-hidden="true">•</span> Reverend Insanity</p>
+    <h1 class="page-title">Choose your next pack.</h1>
+
+    {% if packs %}
+        <section class="collection-grid">
+            {% for pack in packs %}
+                <article class="collection-card rarity-common">
+                    <div class="collection-card-mark" aria-hidden="true">P</div>
+                    <div>
+                        <p class="rarity-label">{{ pack.franchise.name }}</p>
+                        <h3><a href="{% url 'pack_detail' pack.pk %}">{{ pack.name }}</a></h3>
+                    </div>
+                    <p class="quantity">{{ pack.cards_per_pack }}×</p>
+                </article>
+            {% endfor %}
+        </section>
+    {% else %}
+        <section class="empty-state">
+            <p class="eyebrow">No packs yet</p>
+            <h2>There are no active packs.</h2>
+            <p>Add a pack in the admin panel or seed the database.</p>
+        </section>
+    {% endif %}
+{% endblock %}

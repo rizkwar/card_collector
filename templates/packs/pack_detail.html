@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}{{ pack.name }} | Card Collector{% endblock %}
+{% block header_meta %}Pack detail{% endblock %}
+
+{% block content %}
+    <p class="eyebrow">Pack detail <span aria-hidden="true">•</span> {{ pack.franchise.name }}</p>
+    <h1 class="page-title">{{ pack.name }}</h1>
+    <p class="page-intro">This pack contains {{ pack.cards_per_pack }} cards and weighs each pull by the card weight.</p>
+
+    <section class="collection-grid">
+        {% for entry in pack_cards %}
+            <article class="collection-card rarity-{{ entry.card.rarity|lower }}">
+                <div class="collection-card-mark" aria-hidden="true">{{ entry.card.rarity|slice:":1" }}</div>
+                <div>
+                    <p class="rarity-label">{{ entry.card.rarity }}</p>
+                    <h3><a href="{% url 'card_detail' entry.card.pk %}">{{ entry.card.name }}</a></h3>
+                </div>
+                <p class="quantity">{{ entry.weight }}</p>
+            </article>
+        {% endfor %}
+    </section>
+
+    <nav class="page-actions" aria-label="Pack actions">
+        <a class="button button-secondary" href="{% url 'pack_list' %}">Back to packs</a>
+        <a class="button button-primary" href="{% url 'home' %}">Open pack</a>
+    </nav>
+{% endblock %}

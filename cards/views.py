@@ -1,9 +1,9 @@
 import random
 
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 
-from .models import Pack
+from .models import Card, Pack, PackCard
 
 
 PROTOTYPE_CARDS = [
@@ -190,4 +190,47 @@ def prototype_collection(request):
             "total_copies": total_copies,
             "percent": percent,
         },
+    )
+
+
+def pack_list(request):
+    packs = Pack.objects.filter(is_active=True).select_related("franchise")
+    return render(
+        request,
+        "packs/pack_list.html",
+        {"packs": packs},
+    )
+
+
+def pack_detail(request, pk):
+    pack = get_object_or_404(
+        Pack.objects.select_related("franchise"),
+        pk=pk,
+    )
+    pack_cards = (
+        PackCard.objects.filter(pack=pack)
+        .select_related("card", "card__franchise")
+        .order_by("card__rarity", "card__name")
+    )
+    return render(
+        request,
+        "packs/pack_detail.html",
+        {"pack": pack, "pack_cards": pack_cards},
+    )
+
+
+def card_detail(request, pk):
+    card = get_object_or_404(
+        Card.objects.select_related("franchise"),
+        pk=pk,
+    )
+    pack_entries = (
+        PackCard.objects.filter(card=card)
+        .select_related("pack", "pack__franchise")
+        .order_by("pack__name")
+    )
+    return render(
+        request,
+        "cards/card_detail.html",
+        {"card": card, "pack_entries": pack_entries},
     )

@@ -19,4 +19,19 @@ urlpatterns = [
         views.prototype_collection,
         name="collection",
     ),
+    path(
+        "packs/",
+        views.pack_list,
+        name="pack_list",
+    ),
+    path(
+        "packs/<int:pk>/",
+        views.pack_detail,
+        name="pack_detail",
+    ),
+    path(
+        "cards/<int:pk>/",
+        views.card_detail,
+        name="card_detail",
+    ),
 ]

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}{{ card.name }} | Card Collector{% endblock %}
+{% block header_meta %}Card detail{% endblock %}
+
+{% block content %}
+    <p class="eyebrow">Card detail <span aria-hidden="true">•</span> {{ card.franchise.name }}</p>
+    <h1 class="page-title">{{ card.name }}</h1>
+
+    <section class="collection-card rarity-{{ card.rarity|lower }}" style="max-width: 32rem; margin-bottom: 2rem;">
+        <div class="collection-card-mark" aria-hidden="true">{{ card.rarity|slice:":1" }}</div>
+        <div>
+            <p class="rarity-label">{{ card.rarity }}</p>
+            <h3>{{ card.name }}</h3>
+            <p class="franchise-name">{{ card.franchise.name }}</p>
+        </div>
+    </section>
+
+    {% if pack_entries %}
+        <section>
+            <p class="section-kicker">Included in packs</p>
+            <div class="collection-grid">
+                {% for entry in pack_entries %}
+                    <article class="collection-card rarity-{{ entry.pack.franchise.name|lower }}">
+                        <div class="collection-card-mark" aria-hidden="true">P</div>
+                        <div>
+                            <p class="rarity-label">{{ entry.pack.name }}</p>
+                            <h3><a href="{% url 'pack_detail' entry.pack.pk %}">{{ entry.pack.name }}</a></h3>
+                        </div>
+                        <p class="quantity">{{ entry.weight }}</p>
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    <nav class="page-actions" aria-label="Card actions">
+        <a class="button button-secondary" href="{% url 'pack_list' %}">Back to packs</a>
+        <a class="button button-primary" href="{% url 'home' %}">Open another pack</a>
+    </nav>
+{% endblock %}

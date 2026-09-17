@@ -68,3 +68,21 @@ class SeedCardsCommandTests(TestCase):
         self.assertEqual(len(cards), 5)
         self.assertTrue(all(isinstance(card, Card) for card in cards))
         self.assertTrue(all(card.franchise.name == "Reverend Insanity" for card in cards))
+
+    def test_pack_list_page_renders_seeded_pack(self):
+        call_command("seed_cards")
+
+        response = self.client.get(reverse("pack_list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Starter Pack")
+
+    def test_card_detail_page_renders_card_information(self):
+        call_command("seed_cards")
+        card = Card.objects.filter(franchise__name="Reverend Insanity").first()
+
+        response = self.client.get(reverse("card_detail", args=[card.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, card.name)
+        self.assertContains(response, card.franchise.name)
