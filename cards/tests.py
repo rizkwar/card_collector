@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from .models import Card, Franchise, Pack, PackCard, UserCard
-from .views import PROTOTYPE_CARDS, draw_card
+from .views import draw_card
 
 
 class PrototypePackTests(TestCase):
@@ -31,22 +31,27 @@ class PrototypePackTests(TestCase):
         self.assertContains(response, "password")
 
     @patch("cards.views.draw_card")
-    def test_opening_a_pack_counts_duplicate_cards_in_the_session(self, mock_draw_card):
+    def test_opening_a_pack_saves_duplicate_cards_to_user_collection(self, mock_draw_card):
         call_command("seed_cards")
         user = get_user_model().objects.create_user(
             username="session-user",
             password="secret-pass-123",
         )
-        fang_yuan = PROTOTYPE_CARDS[0]
+        fang_yuan = Card.objects.get(name="Fang Yuan")
         mock_draw_card.side_effect = [fang_yuan] * 5
         self.client.login(username="session-user", password="secret-pass-123")
 
         response = self.client.post(reverse("open_pack"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.client.session["collection"], {"Fang Yuan": 5})
+        self.assertEqual(
+            UserCard.objects.get(
+                user=user,
+                card=Card.objects.get(name="Fang Yuan"),
+            ).amount,
+            5,
+        )
         self.assertContains(response, "Copy #5")
-        self.assertEqual(user.username, "session-user")
 
     def test_collection_page_calculates_progress_from_the_session(self):
         session = self.client.session

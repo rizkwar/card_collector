@@ -138,13 +138,10 @@ def prototype_open_pack(request):
     if pack is None:
         raise ValueError("No active pack is available in the database.")
 
-    return _open_pack_for_session(request, pack)
+    return _open_pack_for_user(request, pack)
 
 
-@login_required
-@require_POST
-def open_pack(request, pk):
-    pack = get_object_or_404(Pack, pk=pk, is_active=True)
+def _open_pack_for_user(request, pack):
     drawn_cards = [draw_card(pack) for _ in range(pack.cards_per_pack)]
     pulled_cards = []
 
@@ -175,6 +172,13 @@ def open_pack(request, pk):
             "drawn_cards": pulled_cards,
         },
     )
+
+
+@login_required
+@require_POST
+def open_pack(request, pk):
+    pack = get_object_or_404(Pack, pk=pk, is_active=True)
+    return _open_pack_for_user(request, pack)
 
 
 def prototype_collection(request):
