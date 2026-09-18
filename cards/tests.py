@@ -86,6 +86,27 @@ class PrototypePackTests(TestCase):
         self.assertContains(response, "2 of 6 unique cards found")
         self.assertContains(response, "3 cards collected")
 
+    def test_authenticated_collection_filters_by_card_name(self):
+        call_command("seed_cards")
+        user = get_user_model().objects.create_user(
+            username="filter-user",
+            password="secret-pass-123",
+        )
+        matching_card = Card.objects.filter(name__icontains="Acheron").first()
+        other_card = Card.objects.exclude(pk=matching_card.pk).first()
+        UserCard.objects.create(user=user, card=matching_card, amount=1)
+        UserCard.objects.create(user=user, card=other_card, amount=1)
+        self.client.login(username="filter-user", password="secret-pass-123")
+
+        response = self.client.get(
+            reverse("collection"),
+            {"search": matching_card.name},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, matching_card.name)
+        self.assertNotContains(response, other_card.name)
+
 
 class SeedCardsCommandTests(TestCase):
     def test_seed_cards_creates_starter_data_without_duplicates(self):
@@ -99,10 +120,10 @@ class SeedCardsCommandTests(TestCase):
         self.assertGreater(PackCard.objects.filter(pack=pack).count(), 0)
         self.assertTrue(PackCard.objects.filter(pack=pack).exists())
         self.assertTrue(
-            Card.objects.filter(
-                franchise=franchise,
-                image_url__startswith="/static/img/",
-            ).exists()
+            Card.objects.filter(franchise__name="Honkai: Star Rail", image_url__startswith="/static/img/").exists()
+        )
+        self.assertTrue(
+            Card.objects.filter(franchise__name="Reverend Insanity", image_url="").exists()
         )
 
     def test_seed_cards_creates_new_pack_from_spreadsheet(self):
@@ -228,3 +249,18 @@ class UserCollectionTests(TestCase):
             self.pack.cards_per_pack,
         )
         self.assertContains(response, self.card.name)
+
+        @patch("cards.views.draw_card")
+        def test_pack_open_ajax_returns_in_place_card_stack(self, mock_draw_card):
+            mock_draw_card.return_value = self.card
+            self.client.login(username="tester", password="secret-pass-123")
+
+            response = self.client.post(
+                reverse("pack_open", args=[self.pack.pk]),
+                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            )
+
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, "card-stack")
+            self.assertContains(response, "Swipe the top card")
+            self.assertContains(response, "final-pack-state")

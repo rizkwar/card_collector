@@ -34,6 +34,20 @@ Use another spreadsheet with:
 python manage.py seed_cards --file path\to\cards.csv
 ```
 
+Check that local artwork exists for every spreadsheet card with:
+
+```powershell
+python manage.py validate_card_images
+```
+
+The command expects each image at
+`static/img/<image_url>/<card_name>.png`. For example, a row with
+`image_url=honkai star rail` and `card_name=Acheron` requires
+`static/img/honkai star rail/Acheron.png`.
+
+Missing images are allowed. Cards without a matching PNG use the normal
+rarity placeholder and still display their card name.
+
 Seeding replaces the packs and cards for the franchises included in the
 spreadsheet, so run it before collecting cards or use it only with data you
 intend to refresh.

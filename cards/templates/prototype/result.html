@@ -1,55 +1,8 @@
-{% load static %}
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pack Opened | Card Collector</title>
-    <link rel="stylesheet" href="{% static 'css/prototype.css' %}?v=3">
-</head>
-<body>
-    <div class="page-glow glow-one" aria-hidden="true"></div>
-    <div class="page-glow glow-two" aria-hidden="true"></div>
-    <header class="site-header">
-        <a class="wordmark" href="{% url 'home' %}"><span class="wordmark-mark">CC</span> Card Collector</a>
-        <p class="pack-meta">Pack opened</p>
-    </header>
-    <main class="game-page">
-        <p class="eyebrow">Pack reveal <span aria-hidden="true">•</span> {{ pack.name }}</p>
-        <h1 class="page-title">Your new<br>collection.</h1>
-        <p class="page-intro">{{ pack.cards_per_pack }} cards have been added to your collection.</p>
-        <section class="pull-grid" aria-label="Cards pulled from this pack">
-            {% for card in drawn_cards %}
-                <article class="pull-card rarity-{{ card.rarity|lower }}">
-                    <p class="card-position">0{{ forloop.counter }}</p>
-                    <div class="pull-card-art">
-                        {% if card.image_url %}
-                            <img class="card-image" src="{{ card.image_url }}" alt="{{ card.name }} card artwork">
-                        {% else %}
-                            <span aria-hidden="true">{{ card.rarity|slice:":1" }}</span>
-                        {% endif %}
-                    </div>
-                    <div class="pull-card-info">
-                        <p class="rarity-label">{{ card.rarity }}</p>
-                        <h2>{{ card.name }}</h2>
-                        <p class="franchise-name">{{ card.franchise }}</p>
-                    </div>
-                    {% if card.is_duplicate %}
-                        <p class="card-status">Copy #{{ card.collection_amount }}</p>
-                    {% else %}
-                        <p class="card-status card-status-new">New card</p>
-                    {% endif %}
-                </article>
-            {% endfor %}
-        </section>
-        <nav class="page-actions" aria-label="Pack actions">
-            <a class="button button-secondary" href="{% url 'collection' %}">View collection</a>
-            <form action="{% url 'pack_open' pack.pk %}" method="post">
-                {% csrf_token %}
-                <button class="button button-primary" type="submit">Open pack again <span aria-hidden="true">→</span></button>
-            </form>
-        </nav>
-    </main>
-</body>
-</html>
+{% block title %}Pack Opened | Card Collector{% endblock %}
+{% block header_meta %}Pack opened{% endblock %}
+
+{% block content %}
+    {% include "prototype/result_fragment.html" %}
+{% endblock %}

@@ -12,7 +12,7 @@
     <title>Card Collector</title>
     <link
         rel="stylesheet"
-        href="{% static 'css/prototype.css' %}?v=3"
+        href="{% static 'css/prototype.css' %}?v=10"
     >
 </head>
 
@@ -52,8 +52,12 @@
             <form action="{% url 'open_pack' %}" method="post">
                 {% csrf_token %}
 
-                <button class="pack-button" type="submit" aria-label="Open the {{ pack.name }} card pack">
+                <button class="pack-button" type="button" aria-label="Slide to open the {{ pack.name }} card pack">
                     <span class="pack-shadow" aria-hidden="true"></span>
+                    <span class="pack-reveal-card" aria-hidden="true">
+                        <span>{{ pack.name }}</span>
+                        <strong>?</strong>
+                    </span>
                     <span class="card-pack" aria-hidden="true">
                         <span class="pack-top"></span>
                         <span class="pack-corner pack-corner-left"></span>
@@ -67,6 +71,7 @@
                         <span class="pack-bottom"></span>
                     </span>
                     <span class="open-label">Open pack <span aria-hidden="true">→</span></span>
+                    <span class="pack-open-track" aria-hidden="true"><span></span></span>
                 </button>
             </form>
         {% else %}
@@ -81,5 +86,6 @@
 
         <p class="pull-note">Tap the pack to reveal your pull</p>
     </main>
+    <script src="{% static 'js/pack-opening.js' %}?v=7" defer></script>
 </body>
 </html>

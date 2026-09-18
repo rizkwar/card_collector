@@ -1,0 +1,66 @@
+<div class="result-view reveal-view">
+    <p class="eyebrow">Pack reveal <span aria-hidden="true">•</span> {{ pack.name }}</p>
+    <h1 class="page-title">Your new<br>collection.</h1>
+    <p class="page-intro">{{ pack.cards_per_pack }} cards have been added to your collection.</p>
+    <section class="reveal-stage" aria-label="Swipe through cards pulled from this pack">
+        <div class="opening-board">
+            <div class="card-stack" aria-label="Remaining cards">
+                {% for card in drawn_cards %}
+                    <article class="pull-card reveal-card rarity-{{ card.rarity|lower }}" style="z-index: {{ forloop.revcounter }};" tabindex="0">
+                        <p class="card-position">0{{ forloop.counter }}</p>
+                        <div class="pull-card-art">
+                            {% if card.image_url %}
+                                <img class="card-image" src="{{ card.image_url }}" alt="{{ card.name }} card artwork">
+                            {% else %}
+                                <span aria-hidden="true">{{ card.rarity|slice:":1" }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="pull-card-info">
+                            <p class="rarity-label">{{ card.rarity }}</p>
+                            <h2>{{ card.name }}</h2>
+                            <p class="franchise-name">{{ card.franchise }}</p>
+                        </div>
+                        {% if card.is_duplicate %}
+                            <p class="card-status">Copy #{{ card.collection_amount }}</p>
+                        {% else %}
+                            <p class="card-status card-status-new">New card</p>
+                        {% endif %}
+                    </article>
+                {% endfor %}
+            </div>
+            <div class="revealed-cards" aria-label="Revealed cards"></div>
+            <section class="final-pack-state" aria-label="Open another pack">
+                <p class="eyebrow">Pack complete <span aria-hidden="true">•</span> Ready again</p>
+                <form action="{% url 'pack_open' pack.pk %}" method="post">
+                    {% csrf_token %}
+                    <button class="pack-button" type="button" aria-label="Slide to open the {{ pack.name }} card pack again">
+                        <span class="pack-shadow" aria-hidden="true"></span>
+                        <span class="pack-reveal-card" aria-hidden="true"><span>{{ pack.name }}</span><strong>?</strong></span>
+                        <span class="card-pack" aria-hidden="true">
+                            <span class="pack-top"></span>
+                            <span class="pack-corner pack-corner-left"></span>
+                            <span class="pack-corner pack-corner-right"></span>
+                            <span class="pack-content">
+                                <span class="pack-series">Collector's edition</span>
+                                <span class="pack-title">NINJA<br>CHRONICLES</span>
+                                <span class="pack-symbol">火</span>
+                                <span class="pack-count">{{ pack.cards_per_pack }} cards inside</span>
+                            </span>
+                            <span class="pack-bottom"></span>
+                        </span>
+                        <span class="open-label">Open pack again <span aria-hidden="true">→</span></span>
+                        <span class="pack-open-track" aria-hidden="true"><span></span></span>
+                    </button>
+                </form>
+            </section>
+        </div>
+        <p class="swipe-note">Swipe the top card to reveal the next pull</p>
+    </section>
+    <nav class="page-actions" aria-label="Pack actions">
+        <a class="button button-secondary" href="{% url 'collection' %}">View collection</a>
+        <form class="reveal-again-form" action="{% url 'pack_open' pack.pk %}" method="post">
+            {% csrf_token %}
+            <button class="button button-primary" type="submit">Open pack again <span aria-hidden="true">→</span></button>
+        </form>
+    </nav>
+</div>

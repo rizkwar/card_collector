@@ -150,10 +150,17 @@ class Command(BaseCommand):
 
     @staticmethod
     def local_image_url(franchise_folder, card_name):
-        return (
-            f"/static/img/{quote(franchise_folder, safe='')}/"
-            f"{quote(card_name, safe='')}.png"
+        image_path = (
+            settings.BASE_DIR
+            / "static"
+            / "img"
+            / franchise_folder
+            / f"{card_name}.png"
         )
+        if not image_path.is_file():
+            return ""
+
+        return f"/static/img/{quote(franchise_folder, safe='')}/{quote(card_name, safe='')}.png"
 
     def validate_row(self, row, row_number):
         for column in REQUIRED_COLUMNS:
