@@ -16,7 +16,18 @@
             <span class="wordmark-mark">CC</span>
             Card Collector
         </a>
-        <p class="pack-meta">{% block header_meta %}Collector{% endblock %}</p>
+        <nav class="site-nav" aria-label="Main navigation">
+            <a href="{% url 'pack_list' %}">Packs</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'collection' %}">Collection</a>
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Log out</button>
+                </form>
+            {% else %}
+                <a class="site-nav-accent" href="{% url 'login' %}">Log in</a>
+            {% endif %}
+        </nav>
     </header>
 
     <main class="game-page">

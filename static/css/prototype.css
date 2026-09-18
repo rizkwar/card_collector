@@ -115,6 +115,39 @@ body::before {
     letter-spacing: 0.03em;
 }
 
+.site-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--muted);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.site-nav a,
+.site-nav button {
+    padding: 0.35rem 0;
+    border: 0;
+    color: var(--muted) !important;
+    background: transparent;
+    font: inherit;
+    letter-spacing: inherit;
+    text-decoration: none !important;
+    text-transform: inherit;
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible,
+.site-nav button:hover,
+.site-nav button:focus-visible,
+.site-nav .site-nav-accent {
+    color: var(--cyan-strong) !important;
+}
+
+.site-nav form { margin: 0; }
+
 .opening-screen {
     display: flex;
     flex-direction: column;
@@ -617,6 +650,17 @@ h1 {
 
     .pack-meta {
         font-size: 0.68rem;
+    }
+
+    .site-header {
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .site-nav {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 0.55rem 0.8rem;
     }
 
     .opening-screen {
