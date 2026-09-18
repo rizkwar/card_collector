@@ -3,6 +3,9 @@ from django.core.management.base import BaseCommand
 from cards.models import Card, Franchise, Pack, PackCard, Rarity
 
 
+FRANCHISE_NAME = "Reverend Insanity"
+PACK_NAME = "Starter Pack"
+
 STARTER_CARDS = (
     ("Fang Yuan", Rarity.LEGENDARY, 5),
     ("Bai Ning Bing", Rarity.RARE, 15),
@@ -21,26 +24,29 @@ class Command(BaseCommand):
         Pack.objects.filter(franchise__name="Naruto").delete()
         Card.objects.filter(franchise__name="Naruto").delete()
 
-        franchise, _ = Franchise.objects.get_or_create(name="Reverend Insanity")
-        pack, _ = Pack.objects.update_or_create(
+        franchise, _ = Franchise.objects.get_or_create(name=FRANCHISE_NAME)
+
+        PackCard.objects.filter(pack__franchise=franchise).delete()
+        Pack.objects.filter(franchise=franchise).delete()
+        Card.objects.filter(franchise=franchise).delete()
+
+        pack = Pack.objects.create(
             franchise=franchise,
-            name="Starter Pack",
-            defaults={
-                "cards_per_pack": 5,
-                "is_active": True,
-            },
+            name=PACK_NAME,
+            cards_per_pack=5,
+            is_active=True,
         )
 
         for name, rarity, weight in STARTER_CARDS:
-            card, _ = Card.objects.update_or_create(
+            card = Card.objects.create(
                 franchise=franchise,
                 name=name,
-                defaults={"rarity": rarity},
+                rarity=rarity,
             )
-            PackCard.objects.update_or_create(
+            PackCard.objects.create(
                 pack=pack,
                 card=card,
-                defaults={"weight": weight},
+                weight=weight,
             )
 
         self.stdout.write(

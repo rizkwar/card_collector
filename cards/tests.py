@@ -77,6 +77,19 @@ class SeedCardsCommandTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Starter Pack")
 
+    @patch("cards.views.draw_card")
+    def test_pack_detail_opens_the_selected_pack(self, mock_draw_card):
+        call_command("seed_cards")
+        pack = Pack.objects.get(name="Starter Pack")
+        fang_yuan = Card.objects.get(name="Fang Yuan")
+        mock_draw_card.return_value = fang_yuan
+
+        response = self.client.post(reverse("pack_open", args=[pack.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.client.session["collection"], {"Fang Yuan": 5})
+        self.assertContains(response, "Fang Yuan")
+
     def test_card_detail_page_renders_card_information(self):
         call_command("seed_cards")
         card = Card.objects.filter(franchise__name="Reverend Insanity").first()

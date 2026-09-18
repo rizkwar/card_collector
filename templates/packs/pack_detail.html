@@ -23,6 +23,9 @@
 
     <nav class="page-actions" aria-label="Pack actions">
         <a class="button button-secondary" href="{% url 'pack_list' %}">Back to packs</a>
-        <a class="button button-primary" href="{% url 'home' %}">Open pack</a>
+        <form action="{% url 'pack_open' pack.pk %}" method="post">
+            {% csrf_token %}
+            <button class="button button-primary" type="submit">Open pack</button>
+        </form>
     </nav>
 {% endblock %}

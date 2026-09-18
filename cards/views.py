@@ -87,12 +87,7 @@ def prototype_home(request):
     )
 
 
-@require_POST
-def prototype_open_pack(request):
-    pack = Pack.objects.filter(is_active=True).order_by("pk").first()
-    if pack is None:
-        raise ValueError("No active pack is available in the database.")
-
+def _open_pack_for_session(request, pack):
     drawn_cards = [
         draw_card(pack)
         for _ in range(pack.cards_per_pack)
@@ -133,6 +128,22 @@ def prototype_open_pack(request):
             "drawn_cards": pulled_cards,
         },
     )
+
+
+@require_POST
+def prototype_open_pack(request):
+    pack = Pack.objects.filter(is_active=True).order_by("pk").first()
+    if pack is None:
+        raise ValueError("No active pack is available in the database.")
+
+    return _open_pack_for_session(request, pack)
+
+
+@require_POST
+def open_pack(request, pk):
+    pack = get_object_or_404(Pack, pk=pk, is_active=True)
+    return _open_pack_for_session(request, pack)
+
 
 def prototype_collection(request):
     collection = request.session.get(

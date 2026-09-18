@@ -30,6 +30,11 @@ urlpatterns = [
         name="pack_detail",
     ),
     path(
+        "packs/<int:pk>/open/",
+        views.open_pack,
+        name="pack_open",
+    ),
+    path(
         "cards/<int:pk>/",
         views.card_detail,
         name="card_detail",
