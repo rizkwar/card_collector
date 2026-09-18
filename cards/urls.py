@@ -20,6 +20,11 @@ urlpatterns = [
         name="collection",
     ),
     path(
+        "accounts/signup/",
+        views.signup,
+        name="signup",
+    ),
+    path(
         "packs/",
         views.pack_list,
         name="pack_list",

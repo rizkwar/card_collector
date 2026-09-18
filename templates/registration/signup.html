@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Sign up | Card Collector{% endblock %}
+{% block header_meta %}Sign up{% endblock %}
+
+{% block content %}
+    <p class="eyebrow">New collector</p>
+    <h1 class="page-title">Create an account</h1>
+    <p class="page-intro">Save every pull to your personal collection.</p>
+
+    <form method="post" class="auth-form" style="max-width: 26rem; margin-top: 1.5rem;">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="button button-primary" type="submit">Create account</button>
+    </form>
+{% endblock %}

@@ -30,6 +30,22 @@ class PrototypePackTests(TestCase):
         self.assertContains(response, "username")
         self.assertContains(response, "password")
 
+    def test_signup_creates_and_logs_in_user(self):
+        response = self.client.post(
+            reverse("signup"),
+            {
+                "username": "new-player",
+                "password1": "strong-password-123",
+                "password2": "strong-password-123",
+            },
+        )
+
+        self.assertRedirects(response, reverse("pack_list"))
+        self.assertTrue(self.client.session.get("_auth_user_id"))
+        self.assertTrue(
+            get_user_model().objects.filter(username="new-player").exists()
+        )
+
     @patch("cards.views.draw_card")
     def test_opening_a_pack_saves_duplicate_cards_to_user_collection(self, mock_draw_card):
         call_command("seed_cards")
