@@ -1,6 +1,7 @@
 import csv
 from collections import defaultdict
 from pathlib import Path
+from urllib.parse import quote
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
@@ -108,7 +109,7 @@ class Command(BaseCommand):
                         franchise=franchise,
                         name=card_key[1],
                         rarity=rarity,
-                        image_url=image_url,
+                        image_url=self.local_image_url(image_url, card_key[1]),
                     )
 
                 for pack_key, card_key, weight in franchise_rows:
@@ -147,8 +148,15 @@ class Command(BaseCommand):
             return False
         raise CommandError(f"Invalid is_active value: {value}")
 
+    @staticmethod
+    def local_image_url(franchise_folder, card_name):
+        return (
+            f"/static/img/{quote(franchise_folder, safe='')}/"
+            f"{quote(card_name, safe='')}.png"
+        )
+
     def validate_row(self, row, row_number):
-        for column in REQUIRED_COLUMNS - {"image_url"}:
+        for column in REQUIRED_COLUMNS:
             if not row[column]:
                 raise CommandError(f"Row {row_number}: {column} cannot be empty.")
         if row["rarity"] not in RARITY_VALUES:

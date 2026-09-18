@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pack Opened | Card Collector</title>
-    <link rel="stylesheet" href="{% static 'css/prototype.css' %}">
+    <link rel="stylesheet" href="{% static 'css/prototype.css' %}?v=3">
 </head>
 <body>
     <div class="page-glow glow-one" aria-hidden="true"></div>
@@ -16,9 +16,9 @@
         <p class="pack-meta">Pack opened</p>
     </header>
     <main class="game-page">
-        <p class="eyebrow">Pack reveal <span aria-hidden="true">•</span> Series 001</p>
+        <p class="eyebrow">Pack reveal <span aria-hidden="true">•</span> {{ pack.name }}</p>
         <h1 class="page-title">Your new<br>collection.</h1>
-        <p class="page-intro">Five cards have been added to your collection.</p>
+        <p class="page-intro">{{ pack.cards_per_pack }} cards have been added to your collection.</p>
         <section class="pull-grid" aria-label="Cards pulled from this pack">
             {% for card in drawn_cards %}
                 <article class="pull-card rarity-{{ card.rarity|lower }}">
@@ -45,7 +45,10 @@
         </section>
         <nav class="page-actions" aria-label="Pack actions">
             <a class="button button-secondary" href="{% url 'collection' %}">View collection</a>
-            <a class="button button-primary" href="{% url 'home' %}">Open another pack <span aria-hidden="true">→</span></a>
+            <form action="{% url 'pack_open' pack.pk %}" method="post">
+                {% csrf_token %}
+                <button class="button button-primary" type="submit">Open pack again <span aria-hidden="true">→</span></button>
+            </form>
         </nav>
     </main>
 </body>

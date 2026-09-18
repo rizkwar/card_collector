@@ -440,6 +440,8 @@ h1 {
 .pull-card-art {
     display: grid;
     aspect-ratio: 2 / 3;
+    height: auto !important;
+    min-height: 0;
     width: 100%;
     place-items: center;
     border: 1px solid color-mix(in srgb, var(--rarity-color) 45%, transparent);
@@ -626,9 +628,17 @@ h1 {
     padding: 0.7rem;
 }
 
+.pack-select-button {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 2.2rem;
+    padding: 0.5rem 0.7rem;
+}
+
 .collection-card-mark {
     width: 3.1rem;
     height: auto;
+    min-height: 0;
     border: 1px solid color-mix(in srgb, var(--rarity-color) 35%, transparent);
     background: rgba(9, 22, 27, 0.62);
     font-size: 1.55rem;

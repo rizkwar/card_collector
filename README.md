@@ -14,7 +14,9 @@ franchise,pack,cards_per_pack,is_active,card_name,rarity,weight,image_url
 ```
 
 Each row connects one card to one pack. `rarity` must be one of `COMMON`,
-`UNCOMMON`, `RARE`, or `LEGENDARY`. `image_url` can be blank.
+`UNCOMMON`, `RARE`, or `LEGENDARY`. The final `image_url` column stores the
+lowercase local franchise folder name, such as `honkai star rail`. The seed
+command resolves it to `/static/img/<folder>/<card name>.png`.
 
 Adding a new `pack` value to the spreadsheet automatically creates that pack
 when the seed command runs. The pack does not need to exist in the database

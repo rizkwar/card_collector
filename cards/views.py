@@ -97,9 +97,18 @@ def draw_card(pack):
 
 
 def prototype_home(request):
+    selected_pack_id = request.session.get("selected_pack_id")
+    pack = Pack.objects.filter(
+        pk=selected_pack_id,
+        is_active=True,
+    ).first()
+    if pack is None:
+        pack = Pack.objects.filter(is_active=True).order_by("pk").first()
+
     return render(
         request,
         "prototype/home.html",
+        {"pack": pack},
     )
 
 
@@ -149,14 +158,22 @@ def _open_pack_for_session(request, pack):
 @login_required
 @require_POST
 def prototype_open_pack(request):
-    pack = Pack.objects.filter(is_active=True).order_by("pk").first()
+    selected_pack_id = request.session.get("selected_pack_id")
+    pack = Pack.objects.filter(
+        pk=selected_pack_id,
+        is_active=True,
+    ).first()
+    if pack is None:
+        pack = Pack.objects.filter(is_active=True).order_by("pk").first()
     if pack is None:
         raise ValueError("No active pack is available in the database.")
 
+    request.session["selected_pack_id"] = pack.pk
     return _open_pack_for_user(request, pack)
 
 
 def _open_pack_for_user(request, pack):
+    request.session["selected_pack_id"] = pack.pk
     drawn_cards = [draw_card(pack) for _ in range(pack.cards_per_pack)]
     pulled_cards = []
 
@@ -186,6 +203,7 @@ def _open_pack_for_user(request, pack):
         "prototype/result.html",
         {
             "drawn_cards": pulled_cards,
+            "pack": pack,
         },
     )
 
@@ -306,6 +324,12 @@ def pack_list(request):
         "packs/pack_list.html",
         {"packs": packs},
     )
+
+
+def select_pack(request, pk):
+    pack = get_object_or_404(Pack, pk=pk, is_active=True)
+    request.session["selected_pack_id"] = pack.pk
+    return redirect("home")
 
 
 def pack_detail(request, pk):

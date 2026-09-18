@@ -12,7 +12,7 @@
     <title>Card Collector</title>
     <link
         rel="stylesheet"
-        href="{% static 'css/prototype.css' %}"
+        href="{% static 'css/prototype.css' %}?v=3"
     >
 </head>
 
@@ -42,17 +42,17 @@
     </header>
 
     <main class="opening-screen">
-        <p class="eyebrow">Series 001 <span aria-hidden="true">•</span> Reverend Insanity</p>
-        <h1>One pack.<br>Five new stories.</h1>
+        <p class="eyebrow">Selected pack <span aria-hidden="true">•</span> {{ pack.franchise.name }}</p>
+        <h1>{{ pack.name }}.<br>{{ pack.cards_per_pack }} new stories.</h1>
         <p class="intro">
-            Every pack contains five random cards. Will your next pull be legendary?
+            Every pack contains {{ pack.cards_per_pack }} random cards. Will your next pull be legendary?
         </p>
 
         {% if user.is_authenticated %}
             <form action="{% url 'open_pack' %}" method="post">
                 {% csrf_token %}
 
-                <button class="pack-button" type="submit" aria-label="Open a Reverend Insanity card pack">
+                <button class="pack-button" type="submit" aria-label="Open the {{ pack.name }} card pack">
                     <span class="pack-shadow" aria-hidden="true"></span>
                     <span class="card-pack" aria-hidden="true">
                         <span class="pack-top"></span>
@@ -62,7 +62,7 @@
                             <span class="pack-series">Collector's edition</span>
                             <span class="pack-title">NINJA<br>CHRONICLES</span>
                             <span class="pack-symbol">火</span>
-                            <span class="pack-count">5 cards inside</span>
+                            <span class="pack-count">{{ pack.cards_per_pack }} cards inside</span>
                         </span>
                         <span class="pack-bottom"></span>
                     </span>

@@ -35,6 +35,11 @@ urlpatterns = [
         name="pack_detail",
     ),
     path(
+        "packs/<int:pk>/select/",
+        views.select_pack,
+        name="pack_select",
+    ),
+    path(
         "packs/<int:pk>/open/",
         views.open_pack,
         name="pack_open",

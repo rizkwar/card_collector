@@ -17,6 +17,7 @@
                         <h3><a href="{% url 'pack_detail' pack.pk %}">{{ pack.name }}</a></h3>
                     </div>
                     <p class="quantity">{{ pack.cards_per_pack }}×</p>
+                    <a class="button button-secondary pack-select-button" href="{% url 'pack_select' pack.pk %}">Choose pack</a>
                 </article>
             {% endfor %}
         </section>
