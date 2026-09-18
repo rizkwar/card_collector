@@ -99,10 +99,10 @@ class SeedCardsCommandTests(TestCase):
         self.assertGreater(PackCard.objects.filter(pack=pack).count(), 0)
         self.assertTrue(PackCard.objects.filter(pack=pack).exists())
         self.assertTrue(
-            Card.objects.filter(
-                franchise=franchise,
-                image_url__startswith="/static/img/",
-            ).exists()
+            Card.objects.filter(franchise__name="Honkai: Star Rail", image_url__startswith="/static/img/").exists()
+        )
+        self.assertTrue(
+            Card.objects.filter(franchise__name="Reverend Insanity", image_url="").exists()
         )
 
     def test_seed_cards_creates_new_pack_from_spreadsheet(self):
