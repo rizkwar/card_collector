@@ -175,6 +175,7 @@ def _open_pack_for_user(request, pack):
                 "name": card.name,
                 "franchise": card.franchise.name,
                 "rarity": card.rarity,
+                "image_url": card.image_url,
                 "is_duplicate": previous_amount > 0 or not created,
                 "collection_amount": user_card.amount,
             }
@@ -279,6 +280,7 @@ def collection(request):
                     "name": entry.card.name,
                     "amount": entry.amount,
                     "rarity": entry.card.rarity,
+                    "image_url": entry.card.image_url,
                 }
             )
 

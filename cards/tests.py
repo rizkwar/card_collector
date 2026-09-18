@@ -1,3 +1,5 @@
+import os
+import tempfile
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
@@ -101,6 +103,38 @@ class SeedCardsCommandTests(TestCase):
             ).weight,
             5,
         )
+
+    def test_seed_cards_creates_new_pack_from_spreadsheet(self):
+        spreadsheet = tempfile.NamedTemporaryFile(
+            mode="w",
+            suffix=".csv",
+            encoding="utf-8",
+            newline="",
+            delete=False,
+        )
+        try:
+            spreadsheet.write(
+                "franchise,pack,cards_per_pack,is_active,card_name,rarity,weight,image_url\n"
+                "Reverend Insanity,Expansion Pack,3,true,Fang Yuan,LEGENDARY,10,\n"
+            )
+            spreadsheet.close()
+
+            call_command("seed_cards", file=spreadsheet.name)
+
+            pack = Pack.objects.get(
+                franchise__name="Reverend Insanity",
+                name="Expansion Pack",
+            )
+            self.assertEqual(pack.cards_per_pack, 3)
+            self.assertTrue(
+                PackCard.objects.filter(
+                    pack=pack,
+                    card__name="Fang Yuan",
+                    weight=10,
+                ).exists()
+            )
+        finally:
+            os.unlink(spreadsheet.name)
 
     def test_draw_card_uses_database_pack_cards(self):
         call_command("seed_cards")

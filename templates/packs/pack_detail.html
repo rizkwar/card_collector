@@ -11,7 +11,13 @@
     <section class="collection-grid">
         {% for entry in pack_cards %}
             <article class="collection-card rarity-{{ entry.card.rarity|lower }}">
-                <div class="collection-card-mark" aria-hidden="true">{{ entry.card.rarity|slice:":1" }}</div>
+                <div class="collection-card-mark">
+                    {% if entry.card.image_url %}
+                        <img class="card-image" src="{{ entry.card.image_url }}" alt="{{ entry.card.name }} card artwork">
+                    {% else %}
+                        <span aria-hidden="true">{{ entry.card.rarity|slice:":1" }}</span>
+                    {% endif %}
+                </div>
                 <div>
                     <p class="rarity-label">{{ entry.card.rarity }}</p>
                     <h3><a href="{% url 'card_detail' entry.card.pk %}">{{ entry.card.name }}</a></h3>

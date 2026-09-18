@@ -25,7 +25,13 @@
                     <div class="collection-grid">
                         {% for card in cards %}
                             <article class="collection-card rarity-{{ card.rarity|lower }}">
-                                <div class="collection-card-mark" aria-hidden="true">{{ card.rarity|slice:":1" }}</div>
+                                <div class="collection-card-mark">
+                                    {% if card.image_url %}
+                                        <img class="card-image" src="{{ card.image_url }}" alt="{{ card.name }} card artwork">
+                                    {% else %}
+                                        <span aria-hidden="true">{{ card.rarity|slice:":1" }}</span>
+                                    {% endif %}
+                                </div>
                                 <div><p class="rarity-label">{{ card.rarity }}</p><h3>{{ card.name }}</h3></div>
                                 <p class="quantity">×{{ card.amount }}</p>
                             </article>

@@ -439,14 +439,24 @@ h1 {
 
 .pull-card-art {
     display: grid;
-    height: 9.5rem;
+    aspect-ratio: 2 / 3;
+    width: 100%;
     place-items: center;
     border: 1px solid color-mix(in srgb, var(--rarity-color) 45%, transparent);
     background: radial-gradient(circle at 70% 25%, color-mix(in srgb, var(--rarity-color) 36%, transparent), transparent 28%), linear-gradient(145deg, #17313a, #0c171c);
 }
 
+.card-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 .pull-card-art span,
 .collection-card-mark {
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
     display: grid;
     place-items: center;
     color: var(--rarity-color);
@@ -618,7 +628,7 @@ h1 {
 
 .collection-card-mark {
     width: 3.1rem;
-    height: 4rem;
+    height: auto;
     border: 1px solid color-mix(in srgb, var(--rarity-color) 35%, transparent);
     background: rgba(9, 22, 27, 0.62);
     font-size: 1.55rem;
@@ -693,7 +703,6 @@ h1 {
     .game-page { width: min(100% - 2rem, 74rem); padding-top: 2.3rem; }
     .pull-grid, .collection-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .pull-card { min-height: 15.7rem; }
-    .pull-card-art { height: 8.3rem; }
     .collection-summary { grid-template-columns: 1fr; gap: 1rem; }
     .copy-total { text-align: left; }
     .section-heading { flex-wrap: wrap; }
