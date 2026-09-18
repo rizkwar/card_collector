@@ -189,6 +189,7 @@ h1 {
 }
 
 .pack-button {
+    --open-progress: 0;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -200,6 +201,7 @@ h1 {
     background: transparent;
     cursor: pointer;
     font: inherit;
+    touch-action: pan-y;
 }
 
 .pack-shadow {
@@ -228,7 +230,39 @@ h1 {
     box-shadow: 0 0 0 4px rgba(55, 194, 221, 0.08), 0 1.6rem 2.3rem rgba(0, 0, 0, 0.52), inset 0 0 3rem rgba(107, 241, 255, 0.14);
     isolation: isolate;
     transform: perspective(900px) rotateX(1deg) rotateY(-3deg);
-    transition: filter 240ms ease, transform 240ms ease, box-shadow 240ms ease;
+    transition: filter 240ms ease, transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 240ms ease, opacity 420ms ease;
+}
+
+.pack-reveal-card {
+    position: absolute;
+    top: 1.2rem;
+    left: 50%;
+    display: flex;
+    width: 11.7rem;
+    height: 16.8rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border: 1px solid rgba(178, 247, 255, 0.58);
+    color: var(--cyan-strong);
+    background: linear-gradient(145deg, #214c55, #0b1d23);
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.86);
+    transition: opacity 420ms ease, transform 520ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.pack-reveal-card span {
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.pack-reveal-card strong {
+    font-size: 5rem;
+    line-height: 1;
 }
 
 .card-pack::before,
@@ -369,6 +403,42 @@ h1 {
 .pack-button:focus-visible {
     outline: 2px solid var(--cyan);
     outline-offset: 0.55rem;
+}
+
+.pack-button.is-zoomed .card-pack {
+    transform: perspective(900px) scale(1.08) rotateX(1deg) rotateY(-3deg);
+}
+
+.pack-button.is-zoomed .open-label {
+    color: white;
+}
+
+.pack-button.is-opening .card-pack {
+    opacity: 0.18;
+    transform: perspective(900px) translateY(6rem) rotateX(1deg) rotateY(-3deg);
+}
+
+.pack-button.is-opening .pack-reveal-card {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+}
+
+.pack-open-track {
+    position: absolute;
+    right: 1rem;
+    bottom: -1.1rem;
+    left: 1rem;
+    height: 0.2rem;
+    overflow: hidden;
+    background: rgba(142, 207, 219, 0.2);
+}
+
+.pack-open-track span {
+    display: block;
+    width: calc(var(--open-progress) * 100%);
+    height: 100%;
+    background: var(--cyan-strong);
+    transition: width 100ms ease;
 }
 
 .pull-note {
