@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from .models import Card, Pack, PackCard, UserCard
+from .models import Card, Franchise, Pack, PackCard, Rarity, UserCard
 
 
 def signup(request):
@@ -276,14 +276,30 @@ def prototype_collection(request):
 
 def collection(request):
     if request.user.is_authenticated:
+        search = request.GET.get("search", "").strip()
+        franchise_filter = request.GET.get("franchise", "").strip()
+        rarity_filter = request.GET.get("rarity", "").strip()
         owned_entries = (
             UserCard.objects.filter(user=request.user)
             .select_related("card", "card__franchise")
             .order_by("card__name")
         )
+        if search:
+            owned_entries = owned_entries.filter(card__name__icontains=search)
+        if franchise_filter:
+            owned_entries = owned_entries.filter(
+                card__franchise__name=franchise_filter
+            )
+        if rarity_filter in {choice.value for choice in Rarity}:
+            owned_entries = owned_entries.filter(card__rarity=rarity_filter)
+
+        franchises = Franchise.objects.filter(
+            cards__owner_entries__user=request.user,
+        ).distinct().order_by("name")
         total_unique_possible = Card.objects.count()
-        unique_owned = owned_entries.count()
-        total_copies = sum(entry.amount for entry in owned_entries)
+        all_owned_entries = UserCard.objects.filter(user=request.user)
+        unique_owned = all_owned_entries.count()
+        total_copies = sum(entry.amount for entry in all_owned_entries)
         percent = (
             round((unique_owned / total_unique_possible) * 100, 1)
             if total_unique_possible
@@ -311,6 +327,11 @@ def collection(request):
                 "total_unique_possible": total_unique_possible,
                 "total_copies": total_copies,
                 "percent": percent,
+                "franchises": franchises,
+                "rarities": Rarity.choices,
+                "search": search,
+                "franchise_filter": franchise_filter,
+                "rarity_filter": rarity_filter,
             },
         )
 

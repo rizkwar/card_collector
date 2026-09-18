@@ -7,6 +7,34 @@
     <div class="collection-page">
         <p class="eyebrow">Series 001 <span aria-hidden="true">•</span> Reverend Insanity</p>
         <h1 class="page-title">Your card<br>archive.</h1>
+        <form class="collection-filters" method="get">
+            <label>
+                <span>Search cards</span>
+                <input type="search" name="search" value="{{ search }}" placeholder="Card name">
+            </label>
+            <label>
+                <span>Franchise</span>
+                <select name="franchise">
+                    <option value="">All franchises</option>
+                    {% for franchise in franchises %}
+                        <option value="{{ franchise.name }}"{% if franchise_filter == franchise.name %} selected{% endif %}>{{ franchise.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>
+                <span>Rarity</span>
+                <select name="rarity">
+                    <option value="">All rarities</option>
+                    {% for value, label in rarities %}
+                        <option value="{{ value }}"{% if rarity_filter == value %} selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <button class="button button-primary" type="submit">Filter</button>
+            {% if search or franchise_filter or rarity_filter %}
+                <a class="button button-secondary" href="{% url 'collection' %}">Clear</a>
+            {% endif %}
+        </form>
         <section class="collection-summary" aria-label="Collection progress">
             <div>
                 <p class="summary-label">Collection completion</p>

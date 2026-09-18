@@ -86,6 +86,27 @@ class PrototypePackTests(TestCase):
         self.assertContains(response, "2 of 6 unique cards found")
         self.assertContains(response, "3 cards collected")
 
+    def test_authenticated_collection_filters_by_card_name(self):
+        call_command("seed_cards")
+        user = get_user_model().objects.create_user(
+            username="filter-user",
+            password="secret-pass-123",
+        )
+        matching_card = Card.objects.filter(name__icontains="Acheron").first()
+        other_card = Card.objects.exclude(pk=matching_card.pk).first()
+        UserCard.objects.create(user=user, card=matching_card, amount=1)
+        UserCard.objects.create(user=user, card=other_card, amount=1)
+        self.client.login(username="filter-user", password="secret-pass-123")
+
+        response = self.client.get(
+            reverse("collection"),
+            {"search": matching_card.name},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, matching_card.name)
+        self.assertNotContains(response, other_card.name)
+
 
 class SeedCardsCommandTests(TestCase):
     def test_seed_cards_creates_starter_data_without_duplicates(self):
