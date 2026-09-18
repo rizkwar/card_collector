@@ -132,6 +132,9 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/packs/"
+
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 

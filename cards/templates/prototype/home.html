@@ -36,26 +36,32 @@
             Every pack contains five random cards. Will your next pull be legendary?
         </p>
 
-        <form action="{% url 'open_pack' %}" method="post">
-            {% csrf_token %}
+        {% if user.is_authenticated %}
+            <form action="{% url 'open_pack' %}" method="post">
+                {% csrf_token %}
 
-            <button class="pack-button" type="submit" aria-label="Open a Reverend Insanity card pack">
-                <span class="pack-shadow" aria-hidden="true"></span>
-                <span class="card-pack" aria-hidden="true">
-                    <span class="pack-top"></span>
-                    <span class="pack-corner pack-corner-left"></span>
-                    <span class="pack-corner pack-corner-right"></span>
-                    <span class="pack-content">
-                        <span class="pack-series">Collector's edition</span>
-                        <span class="pack-title">NINJA<br>CHRONICLES</span>
-                        <span class="pack-symbol">火</span>
-                        <span class="pack-count">5 cards inside</span>
+                <button class="pack-button" type="submit" aria-label="Open a Reverend Insanity card pack">
+                    <span class="pack-shadow" aria-hidden="true"></span>
+                    <span class="card-pack" aria-hidden="true">
+                        <span class="pack-top"></span>
+                        <span class="pack-corner pack-corner-left"></span>
+                        <span class="pack-corner pack-corner-right"></span>
+                        <span class="pack-content">
+                            <span class="pack-series">Collector's edition</span>
+                            <span class="pack-title">NINJA<br>CHRONICLES</span>
+                            <span class="pack-symbol">火</span>
+                            <span class="pack-count">5 cards inside</span>
+                        </span>
+                        <span class="pack-bottom"></span>
                     </span>
-                    <span class="pack-bottom"></span>
-                </span>
-                <span class="open-label">Open pack <span aria-hidden="true">→</span></span>
-            </button>
-        </form>
+                    <span class="open-label">Open pack <span aria-hidden="true">→</span></span>
+                </button>
+            </form>
+        {% else %}
+            <div class="page-actions">
+                <a class="button button-primary" href="{% url 'login' %}">Log in to open a pack</a>
+            </div>
+        {% endif %}
 
         <div class="page-actions">
             <a class="button button-secondary" href="{% url 'pack_list' %}">Browse packs</a>

@@ -1,9 +1,10 @@
 import random
 
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 
-from .models import Card, Pack, PackCard
+from .models import Card, Pack, PackCard, UserCard
 
 
 PROTOTYPE_CARDS = [
@@ -130,6 +131,7 @@ def _open_pack_for_session(request, pack):
     )
 
 
+@login_required
 @require_POST
 def prototype_open_pack(request):
     pack = Pack.objects.filter(is_active=True).order_by("pk").first()
@@ -139,10 +141,40 @@ def prototype_open_pack(request):
     return _open_pack_for_session(request, pack)
 
 
+@login_required
 @require_POST
 def open_pack(request, pk):
     pack = get_object_or_404(Pack, pk=pk, is_active=True)
-    return _open_pack_for_session(request, pack)
+    drawn_cards = [draw_card(pack) for _ in range(pack.cards_per_pack)]
+    pulled_cards = []
+
+    for card in drawn_cards:
+        user_card, created = UserCard.objects.get_or_create(
+            user=request.user,
+            card=card,
+            defaults={"amount": 0},
+        )
+        previous_amount = user_card.amount
+        user_card.amount += 1
+        user_card.save()
+
+        pulled_cards.append(
+            {
+                "name": card.name,
+                "franchise": card.franchise.name,
+                "rarity": card.rarity,
+                "is_duplicate": previous_amount > 0 or not created,
+                "collection_amount": user_card.amount,
+            }
+        )
+
+    return render(
+        request,
+        "prototype/result.html",
+        {
+            "drawn_cards": pulled_cards,
+        },
+    )
 
 
 def prototype_collection(request):
@@ -202,6 +234,48 @@ def prototype_collection(request):
             "percent": percent,
         },
     )
+
+
+def collection(request):
+    if request.user.is_authenticated:
+        owned_entries = (
+            UserCard.objects.filter(user=request.user)
+            .select_related("card", "card__franchise")
+            .order_by("card__name")
+        )
+        total_unique_possible = Card.objects.count()
+        unique_owned = owned_entries.count()
+        total_copies = sum(entry.amount for entry in owned_entries)
+        percent = (
+            round((unique_owned / total_unique_possible) * 100, 1)
+            if total_unique_possible
+            else 0
+        )
+
+        by_franchise = {}
+        for entry in owned_entries:
+            franchise_name = entry.card.franchise.name
+            by_franchise.setdefault(franchise_name, []).append(
+                {
+                    "name": entry.card.name,
+                    "amount": entry.amount,
+                    "rarity": entry.card.rarity,
+                }
+            )
+
+        return render(
+            request,
+            "prototype/collection.html",
+            {
+                "by_franchise": by_franchise,
+                "unique_owned": unique_owned,
+                "total_unique_possible": total_unique_possible,
+                "total_copies": total_copies,
+                "percent": percent,
+            },
+        )
+
+    return prototype_collection(request)
 
 
 def pack_list(request):

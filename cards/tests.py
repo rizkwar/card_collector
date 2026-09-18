@@ -1,30 +1,52 @@
 from unittest.mock import patch
 
+from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Card, Franchise, Pack, PackCard
+from .models import Card, Franchise, Pack, PackCard, UserCard
 from .views import PROTOTYPE_CARDS, draw_card
 
 
 class PrototypePackTests(TestCase):
-    def test_open_pack_only_accepts_post(self):
+    def test_home_page_prompts_login_when_logged_out(self):
+        response = self.client.get(reverse("home"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Log in to open a pack")
+
+    def test_open_pack_requires_login(self):
         response = self.client.get(reverse("open_pack"))
 
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
+    def test_login_page_renders_login_form(self):
+        response = self.client.get(reverse("login"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Log in")
+        self.assertContains(response, "username")
+        self.assertContains(response, "password")
 
     @patch("cards.views.draw_card")
     def test_opening_a_pack_counts_duplicate_cards_in_the_session(self, mock_draw_card):
         call_command("seed_cards")
+        user = get_user_model().objects.create_user(
+            username="session-user",
+            password="secret-pass-123",
+        )
         fang_yuan = PROTOTYPE_CARDS[0]
         mock_draw_card.side_effect = [fang_yuan] * 5
+        self.client.login(username="session-user", password="secret-pass-123")
 
         response = self.client.post(reverse("open_pack"))
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.client.session["collection"], {"Fang Yuan": 5})
         self.assertContains(response, "Copy #5")
+        self.assertEqual(user.username, "session-user")
 
     def test_collection_page_calculates_progress_from_the_session(self):
         session = self.client.session
@@ -80,14 +102,19 @@ class SeedCardsCommandTests(TestCase):
     @patch("cards.views.draw_card")
     def test_pack_detail_opens_the_selected_pack(self, mock_draw_card):
         call_command("seed_cards")
+        user = get_user_model().objects.create_user(
+            username="pack-user",
+            password="secret-pass-123",
+        )
         pack = Pack.objects.get(name="Starter Pack")
         fang_yuan = Card.objects.get(name="Fang Yuan")
         mock_draw_card.return_value = fang_yuan
+        self.client.login(username="pack-user", password="secret-pass-123")
 
         response = self.client.post(reverse("pack_open", args=[pack.pk]))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.client.session["collection"], {"Fang Yuan": 5})
+        self.assertEqual(UserCard.objects.get(user=user, card=fang_yuan).amount, 5)
         self.assertContains(response, "Fang Yuan")
 
     def test_card_detail_page_renders_card_information(self):
@@ -99,3 +126,35 @@ class SeedCardsCommandTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, card.name)
         self.assertContains(response, card.franchise.name)
+
+
+class UserCollectionTests(TestCase):
+    def setUp(self):
+        call_command("seed_cards")
+        self.user = get_user_model().objects.create_user(
+            username="tester",
+            password="secret-pass-123",
+        )
+
+    @patch("cards.views.draw_card")
+    def test_pack_open_requires_login(self, mock_draw_card):
+        pack = Pack.objects.get(name="Starter Pack")
+        mock_draw_card.return_value = Card.objects.get(name="Fang Yuan")
+
+        response = self.client.post(reverse("pack_open", args=[pack.pk]))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
+
+    @patch("cards.views.draw_card")
+    def test_pack_open_updates_user_collection(self, mock_draw_card):
+        pack = Pack.objects.get(name="Starter Pack")
+        fang_yuan = Card.objects.get(name="Fang Yuan")
+        mock_draw_card.return_value = fang_yuan
+        self.client.login(username="tester", password="secret-pass-123")
+
+        response = self.client.post(reverse("pack_open", args=[pack.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(UserCard.objects.get(user=self.user, card=fang_yuan).amount, 5)
+        self.assertContains(response, "Fang Yuan")

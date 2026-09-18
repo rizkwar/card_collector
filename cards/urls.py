@@ -16,7 +16,7 @@ urlpatterns = [
     ),
     path(
         "collection/",
-        views.prototype_collection,
+        views.collection,
         name="collection",
     ),
     path(
