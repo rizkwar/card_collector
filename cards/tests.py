@@ -249,3 +249,18 @@ class UserCollectionTests(TestCase):
             self.pack.cards_per_pack,
         )
         self.assertContains(response, self.card.name)
+
+        @patch("cards.views.draw_card")
+        def test_pack_open_ajax_returns_in_place_card_stack(self, mock_draw_card):
+            mock_draw_card.return_value = self.card
+            self.client.login(username="tester", password="secret-pass-123")
+
+            response = self.client.post(
+                reverse("pack_open", args=[self.pack.pk]),
+                HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            )
+
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, "card-stack")
+            self.assertContains(response, "Swipe the top card")
+            self.assertContains(response, "final-pack-state")

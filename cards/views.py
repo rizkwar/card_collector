@@ -198,14 +198,20 @@ def _open_pack_for_user(request, pack):
             }
         )
 
-    return render(
-        request,
-        "prototype/result.html",
-        {
-            "drawn_cards": pulled_cards,
-            "pack": pack,
-        },
+    rarity_order = {
+        "COMMON": 0,
+        "UNCOMMON": 1,
+        "RARE": 2,
+        "LEGENDARY": 3,
+    }
+    pulled_cards.sort(key=lambda card: rarity_order.get(card["rarity"], 99))
+
+    template = (
+        "prototype/result_fragment.html"
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest"
+        else "prototype/result.html"
     )
+    return render(request, template, {"drawn_cards": pulled_cards, "pack": pack})
 
 
 @login_required

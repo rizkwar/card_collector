@@ -157,6 +157,23 @@ body::before {
     text-align: center;
 }
 
+.opening-screen.is-transitioning > * {
+    opacity: 0;
+    transform: translateY(0.8rem) scale(0.985);
+}
+
+.opening-screen.has-result > * {
+    animation: reveal-entry 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.opening-screen.has-result > *:nth-child(2) { animation-delay: 45ms; }
+.opening-screen.has-result > *:nth-child(3) { animation-delay: 90ms; }
+
+@keyframes reveal-entry {
+    from { opacity: 0; transform: translateY(0.8rem) scale(0.985); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 .eyebrow {
     margin: 0 0 1.1rem;
     color: var(--cyan);
@@ -506,6 +523,139 @@ h1 {
     gap: 0.85rem;
 }
 
+.reveal-stage {
+    width: min(100%, 24rem);
+    margin: 1rem auto 0;
+    text-align: center;
+}
+
+.opening-board {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+}
+
+.card-stack {
+    position: relative;
+    width: 100%;
+    height: 29rem;
+    isolation: isolate;
+}
+
+.reveal-card {
+    --swipe-rotation: 0deg;
+    position: absolute;
+    inset: 0;
+    margin: 0 auto;
+    width: min(18rem, calc(100vw - 3rem));
+    min-height: 26rem;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    transform: translate3d(0, var(--swipe-distance, 0px), 0) rotate(var(--swipe-rotation));
+    transition: transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 300ms ease;
+}
+
+.card-stack .reveal-card {
+    position: absolute;
+}
+
+.reveal-card.is-dragging { cursor: grabbing; transition: none; }
+
+.reveal-card.is-returning {
+    transition: transform 360ms cubic-bezier(0.22, 0.8, 0.25, 1);
+}
+
+.reveal-card.is-pulling {
+    pointer-events: none;
+    transform: translate3d(0, var(--swipe-distance), 0) rotate(var(--swipe-rotation)) scale(1.03);
+    transition: transform var(--pull-duration, 460ms) cubic-bezier(0.2, 0.8, 0.2, 1), opacity var(--pull-duration, 460ms) ease;
+}
+
+.reveal-card.is-pulling::after {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 25%, rgba(255, 255, 255, 0.18), transparent 65%);
+    content: "";
+    pointer-events: none;
+}
+
+.reveal-card img {
+    pointer-events: none;
+}
+
+.revealed-cards {
+    display: flex;
+    min-height: 8.5rem;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-top: 1px solid rgba(142, 207, 219, 0.18);
+}
+
+.revealed-cards .reveal-card {
+    position: relative;
+    inset: auto;
+    width: 5.1rem;
+    min-height: 7.5rem;
+    margin: 0;
+    padding: 0.35rem;
+    cursor: default;
+    opacity: 0.72;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.92);
+    transition: transform 280ms ease, opacity 280ms ease;
+}
+
+.revealed-cards .reveal-card:hover {
+    opacity: 1;
+    transform: translate3d(0, -0.2rem, 0) rotate(0deg) scale(0.96);
+}
+
+.revealed-cards .pull-card-art {
+    height: 100%;
+}
+
+.revealed-cards .pull-card-info,
+.revealed-cards .card-position,
+.revealed-cards .card-status {
+    display: none;
+}
+
+.swipe-note {
+    margin: 1rem 0 0;
+    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+}
+
+.final-pack-state {
+    position: absolute;
+    z-index: 5;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-height: none;
+    justify-items: center;
+    pointer-events: none;
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(0.94);
+    transition: visibility 0s linear 420ms, opacity 420ms ease, transform 520ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.reveal-view.is-complete .final-pack-state {
+    pointer-events: auto;
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1);
+    transition-delay: 0s;
+}
+
+.final-pack-state .pack-button { margin-top: 0.3rem; }
+.reveal-view.is-complete .card-stack { opacity: 0.18; transition: opacity 420ms ease; }
+
 .pull-card,
 .collection-card {
     --rarity-color: #b5c0c4;
@@ -521,7 +671,7 @@ h1 {
     transition: transform 180ms ease, border-color 180ms ease;
 }
 
-.pull-card:hover {
+.pull-card:not(.reveal-card):hover {
     border-color: var(--rarity-color);
     transform: translateY(-0.35rem);
 }
